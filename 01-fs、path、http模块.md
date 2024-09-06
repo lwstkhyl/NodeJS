@@ -40,13 +40,15 @@
     - [网页资源加载](#网页资源加载)
     - [静态资源服务](#静态资源服务)
     - [补充：网页url](#补充网页url)
+    - [mime类型](#mime类型)
+    - [GET和POST请求](#get和post请求)
 
 <!-- /code_chunk_output -->
 
 <!-- 打开侧边预览：f1->Markdown Preview Enhanced: open...
 只有打开侧边预览时保存才自动更新目录 -->
 
-写在前面：此笔记来自b站课程[尚硅谷Node.js零基础视频教程](https://www.bilibili.com/video/BV1gM411W7ex) / [资料下载](https://pan.baidu.com/share/init?surl=sDOMvUdY9UF3mlJ7ujOADg&pwd=s3wj#list/path=%2F) 提取码：s3wj
+写在前面：此笔记来自b站课程[尚硅谷Node.js零基础视频教程](https://www.bilibili.com/video/BV1gM411W7ex) P1-P66 / [资料下载](https://pan.baidu.com/share/init?surl=sDOMvUdY9UF3mlJ7ujOADg&pwd=s3wj#list/path=%2F) 提取码：s3wj
 ### NodeJS简介
 ##### 基本使用
 Node.js是一种JS运行环境，可以理解成是一个可以运行JS程序的软件
@@ -442,7 +444,7 @@ fs.unlinkSync('./test1.txt');
   - 对于同步读取，它将读取结果直接返回
 
 例：
-- **创建**
+- 创建
     ```js
     const fs = require('fs');
     fs.mkdir('./html', err => {
@@ -455,7 +457,7 @@ fs.unlinkSync('./test1.txt');
     //递归创建
     fs.mkdirSync('./a/b', { recursive: true });
     ```
-- **读取**
+- 读取
     ```js
     const fs = require('fs');
     fs.readdir('./', (err, data) => {
@@ -468,7 +470,7 @@ fs.unlinkSync('./test1.txt');
     console.log('../', fs.readdirSync('../'));
     ```
     ![文件夹操作1](./md-image/文件夹操作1.png){:width=200 height=200}
-- **删除**
+- 删除
     ```js
     const fs = require('fs');
     fs.rmdirSync('./html');
@@ -554,7 +556,7 @@ fs.stat('./test.png', (err, data) => {
 绝对路径：
 - `D:/xxx`
 - `/xxx`常见于Linux，但Windows中也可以使用，它表示在当前工作路径的根目录下使用xxx文件
-  - 例如当前工作路径是`C:/a/b`，`/xxx`指的就是`C:/xxx`；当前工作路径是`D:/a/b`，`/xxx`指的就是`D:/xxx`
+  - 例如当前工作路径是`C:/a/b`，`/xxx`指的就是`C:/xxx`；当前工作路径是`D:/a/b/c`，`/xxx`指的就是`D:/xxx`
 
 一个小问题：现想要在`test.js`的目录下创建一个新文件`test.txt`，正常情况下应使用：
 ```js
@@ -722,7 +724,7 @@ HTTP(hypertext transfer protocol)**超文本传输协议**：对浏览器和服�
 ![请求4](./md-image/请求4.png){:width=300 height=300}
 **请求行**：由三部分组成——请求方法、url、HTTP版本号
 ![请求5](./md-image/请求5.png){:width=100 height=100}
-- 请求方法：
+- **请求方法**：
 
     | 方法         | 作用     |
     | ------------ | -------- |
@@ -762,8 +764,8 @@ HTTP(hypertext transfer protocol)**超文本传输协议**：对浏览器和服�
 ![响应1](./md-image/响应1.png){:width=300 height=300}
 **响应行**：由三部分组成——HTTP版本号、响应状态码、响应状态的描述
 ![响应2](./md-image/响应2.png){:width=80 height=80}
-- HTTP版本号同[请求](#请求)
-- 响应状态码：标识响应的结果状态
+- **HTTP版本号**同[请求](#请求)
+- **响应状态码**：标识响应的结果状态
 
     | 状态码 | 含义           |
     | ------ | -------------- |
@@ -781,7 +783,7 @@ HTTP(hypertext transfer protocol)**超文本传输协议**：对浏览器和服�
     | 4xx    | 客户端错误响应 |
     | 5xx    | 服务器错误响应 |
 
-- 响应状态的描述：是一个字符串，绝大部分时候与响应状态码对应
+- **响应状态的描述**：是一个字符串，绝大部分时候与响应状态码对应
 
     | 状态码 | 状态描述              |
     | ------ | --------------------- |
@@ -1132,7 +1134,7 @@ server.listen(9000, () => {
 ```
 ![设置响应报文3](./md-image/设置响应报文3.png){:width=600 height=600}
 注：因为write和end方法可以接收buffer作为参数，无需手动toString转换
-[查看html文件](./practice/01-01设置响应报文/table.html)
+[查看html文件（包含JS和CSS）](./practice/01-01设置响应报文/table.html)
 ##### 网页资源加载
 **网页资源加载的基本过程**：假设有一个HTML文件，它引入了一个CSS文件和一个JS文件，HTML文件中还有一张图片。现在要把它们作为响应报文发送到网页上，服务器先响应HTML文件，网页对其进行解析
 - 当读到`<title>`时，网页的标题被更改
@@ -1228,3 +1230,144 @@ const file_path = root + pathname; //请求的文件路径
     ![补充：网页url1](./md-image/补充：网页url1.png){:width=150 height=150}
 - `/search`会自动补上当前网页的协议、主机名、端口号，跳转到`http://127.0.0.1:9000/search`
 为什么这种方式使用较多：如果主机名更换，但只要路径不变，就无需更改a标签
+
+---
+
+**相对路径**：在发送请求时，需要与当前页面url进行计算，得到完整url后再发送请求
+例如当前url为`http://xxx.com/course/h5.html`，则当前所在“文件夹”为`http://xxx.com/course`
+| 形式              | 最终url                             |
+| ----------------- | ----------------------------------- |
+| `./css/app.css`   | `http://xxx.com/course/css/app.css` |
+| `css/app.css`     | `http://xxx.com/course/css/app.css` |
+| `../img/logo.png` | `http://xxx.com/img/logo.png`       |
+
+前两种（`./`或省略不写）都是在当前文件夹下取文件，`../`是上一级目录。注意：如果已经在网页路径的最外层`http://xxx.com`，即使再`../`也不会跳出当前路径，比如上例中`../../img/logo.png`仍表示`http://xxx.com/img/logo.png`
+相对路径在学习阶段使用较多，但在实际开发项目中不常用。这是因为相对路径依赖于当前页面url，不可靠，如果页面url不正常时，获取资源会出问题
+
+---
+
+**页面中使用url的场景**：a/link/script/img/video/audio标签、form标签中的action、AJAX请求的url
+##### mime类型
+**媒体类型**(Multipurpose Internet Mail Extensions/MIME)：用于表示文档、文件或字节流的性质和格式
+结构：`[type]/[subType]`即`主类型/子类型`
+| 文件格式 | MIME类型         |
+| -------- | ---------------- |
+| html     | text/html        |
+| css      | text/css         |
+| js       | text/javascript  |
+| png      | image/png        |
+| jpg      | image/jpeg       |
+| gif      | image/gif        |
+| mp4      | video/mp4        |
+| mp3      | audio/mpeg       |
+| json     | application/json |
+
+服务端可以设置响应体`Content-Type`表明响应体的MIME类型，浏览器据此决定如何处理响应内容
+对于未知的资源类型，可以设置MIME类型为"application/octet-stream"，浏览器遇到该种响应时，会对其独立存储，也就是**下载**的效果
+
+---
+
+现在我们可以完善[设置响应报文](#设置响应报文)中的例子了：根据请求文件的后缀名设置`Content-Type`，并响应对应文件。这样可以让浏览器对不同文件进行不同处理，使响应的css/js生效
+文件目录：
+![mime类型1](./md-image/mime类型1.png){:width=150 height=150}
+可以看到根目录为page文件夹
+```js
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const mimes = { //一个字典，键是后缀，值是对应的mime
+    html: 'text/html',
+    css: 'text/css',
+    js: 'text/javascript',
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    gif: 'image/gif',
+    mp4: 'video/mp4',
+    mp3: 'audio/mpeg',
+    json: 'application/json'
+};
+const server = http.createServer((request, response) => {
+    if (request.method !== 'GET') { //请求类型错误
+        request.statusCode = 405;
+        response.end('<h1>405 Method Not Allowed</h1>');
+        return;
+    }
+    const { pathname } = new URL(request.url, 'http://1.1.1.1'); //获取请求路径
+    const root = __dirname + '/page'; //网页根目录
+    const file_path = root + pathname; //请求的文件路径
+    fs.readFile(file_path, (err, data) => {
+        if (err) {
+            response.setHeader('content-type', 'text/html;charset=utf-8');
+            switch (err.code) { //错误类型判断
+                case "ENOENT":
+                    response.statusCode = 404;
+                    response.end('<h1>404 Not Found</h1>');
+                    break;
+                case "EPERM":
+                    response.statusCode = 403;
+                    response.end('<h1>403 Forbidden</h1>');
+                    break;
+                default:
+                    response.statusCode = 500;
+                    response.end('<h1>Internal Server Error</h1>');
+                    break;
+            }
+            return;
+        }
+        const ext = path.extname(file_path).slice(1); //后缀名（去掉前面的.）
+        const mime = mimes[ext]; //获取对应的mime
+        if (mime) { //获取到了mime
+            if (ext === 'html') { //如果是HTML，加上charset
+                response.setHeader('content-type', mime + ';charset=utf-8');
+            } else { //其它格式不用加
+                response.setHeader('content-type', mime);
+            }
+        } else { //没获取到，设为application/octet-stream
+            response.setHeader('content-type', 'application/octet-stream');
+        }
+        response.end(data);
+    })
+});
+server.listen(9000, () => {
+    console.log("服务已经启动");
+});
+```
+**中文乱码问题**：在`Content-Type`的mime后加上`charset=utf-8`
+为什么HTML页面不加`charset=utf-8`也不乱码：因为HTML的head中设置了`<meta charset="UTF-8">`。这两种方式中，响应头`Content-Type`的设置优先级更高
+在实际应用中，除了HTML，其它格式的响应都无需加`charset=utf-8`，因为浏览器会根据页面的字符集对这些文件进行解析，即使我们在网页中打开这些文件看到乱码，也不影响浏览器实际解析这些文件
+**完善错误处理**：
+- 如果请求方式不是GET，返回405状态码
+- 根据`err`对象中code属性值
+  - 'ENOENT'：资源不存在，此时应返回404状态码
+  - 'EPERM'：不允许操作，响应的文件禁止访问（权限不够），此时应返回403状态码
+
+**错误的验证方式**：
+- 请求方式不是GET：使用表单——另建一个HTML文件
+    ```html
+    <form action="http://127.0.0.1:9000/table.html" method="post">
+        <input type="text" name="xxx">
+        <input type="submit" value="submit">
+    </form>
+    ```
+- 资源不存在：输入错误的路径
+- 不允许操作：更改文件读取权限（右键文件->属性->安全->编辑->读取和执行）
+##### GET和POST请求
+**GET请求**：
+- 在地址栏直接输入网址访问
+- 点击a链接跳转
+- link标签引入CSS
+- script标签引入JS
+- video和audio标签引入多媒体文件
+- img标签引入图片
+- form表单默认提交方法
+- Ajax中的get请求
+
+**POST请求**：
+- form表单指定提交方式为post
+- Ajax中的post请求
+
+**区别**：
+- 作用：GET主要用于获取数据，POST主要用于提交数据
+- 参数位置：GET的带参数请求是将参数放到url后，POST是将参数放到请求体中
+- 安全性：POST相对安全一些，因为浏览器中参数会暴露在地址栏中。当然如果使用抓包的方式，仍可获取POST请求的参数
+- 请求大小：GET请求大小有限制（一般为2K），POST无限制
