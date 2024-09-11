@@ -1,0 +1,25 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "b站课程<a href=\"https://www.bilibili.com/video/BV1gM411W7ex/\" target=\"_blank\">尚硅谷Node.js零基础视频教程</a>笔记",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lwstkhyl/NodeJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lwstkhyl/NodeJS/issues"
+  },
+  "homepage": "https://github.com/lwstkhyl/NodeJS#readme",
+  "dependencies": {
+    "express": "^4.20.0"
+  }
+}
