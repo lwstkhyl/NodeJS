@@ -44,6 +44,11 @@
     - [express-generator](#express-generator)
 - [案例：记账本](#案例记账本)
     - [响应静态页面](#响应静态页面)
+    - [获取表单数据](#获取表单数据)
+    - [lowdb包保存信息](#lowdb包保存信息)
+    - [添加成功后提醒](#添加成功后提醒)
+    - [渲染记账列表](#渲染记账列表)
+    - [删除账单](#删除账单)
 
 <!-- /code_chunk_output -->
 
@@ -1140,4 +1145,154 @@ router.get('/', function (req, res, next) {
   res.render('list');
 });
 module.exports = router;
+```
+##### 获取表单数据
+首先更改表单，为表单添加action跳转链接，并给每个输入框/选项框命名（添加name或value属性）
+```html
+<form method="post" action="/account">
+    <input name="title" type="text" class="form-control" id="item" />
+    <input name="time" type="text" class="form-control" id="time" />
+    <select name="type" class="form-control" id="type">
+        <option value="-1">支出</option>
+        <option value="1">收入</option>
+    </select>
+    <input name="account" type="text" class="form-control" id="account" />
+    <textarea name="remarks" class="form-control" id="remarks"></textarea>
+</form>
+```
+因为`express-generator`框架已经添加了获取请求体数据的中间件，这里可以直接使用`req.body`获取
+```js
+router.post('/', function (req, res) {
+  console.log(req.body);
+  res.send('添加记录');
+});
+```
+##### lowdb包保存信息
+相当于一个简单的数据库，以json文件的格式存储数据
+使用`npm i lowdb@1.0.0`安装
+```js
+//导入包
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
+const adapter = new FileSync("db.json"); //存储的json文件名
+//获取db对象
+const db = low(adapter);
+//初始化数据
+db.defaults({
+    键名1: [], //数组形式，可以向里面添加多个对象
+    键名2: {} //对象形式，可以向里面添加键值对（单个对象）
+    , ...
+}).write();
+db.get("键名").push(对象).write(); //向键中添加数据（添加在最后面)
+db.get("键名").unshift(对象).write(); //向键中添加数据（添加在最前面)
+db.get("键名").remove(对象).write(); //删除指定条件的数据，返回删除掉的那个对象
+console.log(db.get("键名").find(对象).value()); //获取指定条件的数据
+console.log(db.get("键名").value()); //获取键值
+db.get("键名").find(对象).assign(新对象).write(); //更改
+```
+注：删除和查询中使用的对象不一定要写全，比如在`key`键中有`{id:1, name:"abc"}`和`{id:2, name:"bcd"}`两个对象，可以只写`db.get("key").find({id:1}).value()`，就获取到id为1的那个对象`{id:1, name:"abc"}`
+
+---
+
+实际操作中，一般手动完成初始化，否则初始化代码会被重复执行：新建文件夹`data`，其中新建文件`db.json`用于存储数据
+```js
+{
+    "accounts": []
+}
+```
+在post请求路由中使用
+```js
+db.get("accounts").unshift(req.body).write();
+```
+将请求体添加进去。为了方便后续读取时，先展示时间较近（后添加）的数据，使用`unshift`添加在最前面
+
+---
+
+同时为了每条数据都有一个id方便操作，使用`shortid`包，`npm i shortid`
+account.js：
+```js
+//导入lowdb包
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
+const adapter = new FileSync(__dirname + "/../data/db.json");
+const db = low(adapter);
+//导入shortid包
+const shortid = require("shortid");
+//响应表单提交的post请求
+router.post('/', function (req, res) {
+  const id = shortid.generate(); //创建id
+  db.get("accounts").unshift({ id: id, ...req.body }).write(); //添加数据
+  res.send('添加记录');
+});
+```
+##### 添加成功后提醒
+即添加成功后响应一个网页，标识添加成功
+在`views`文件夹中创建`success.ejs`，将资料中`success.html`文件内容复制过去，更改提醒信息和跳转链接：
+```html
+<h1>:) <%= msg %></h1>
+<p><a href="<%= url %>">点击跳转</a></p>
+```
+将`account.js`的post请求路由中`res.send('添加记录')`改为：
+```js
+res.render('success', { msg: "添加成功", url: "/account" }); //添加成功提醒
+```
+##### 渲染记账列表
+使用ejs的列表和条件渲染
+list.ejs：
+```html
+<div class="accounts">
+    <% accounts.forEach(account=>{ %>
+        <% if(account.type==='-1'){ %>
+        <div class="panel panel-danger">
+            <div class="panel-heading"><%= account.time %></div>
+            <div class="panel-body">
+                <div class="col-xs-6"><%= account.title %></div>
+                <div class="col-xs-2 text-center">
+                    <span class="label label-warning">支出</span>
+                </div>
+                <div class="col-xs-2 text-right"><%= account.account %></div>
+                <div class="col-xs-2 text-right">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+        <% }else{ %>
+        <div class="panel panel-success">
+            <div class="panel-heading"><%= account.time %></div>
+            <div class="panel-body">
+                <div class="col-xs-6"><%= account.title %></div>
+                <div class="col-xs-2 text-center">
+                    <span class="label label-success">收入</span>
+                </div>
+                <div class="col-xs-2 text-right"><%= account.account %></div>
+                <div class="col-xs-2 text-right">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    <% }) %>
+</div>
+```
+将`account.js`的get请求路由中`res.render('list')`改为：
+```js
+res.render('list', { accounts: accounts }); //渲染账单
+```
+##### 删除账单
+点击账单中的`x`时删除账单
+![案例：记账本4](./md-image/案例：记账本4.png){:width=100 height=100}
+思路：给`x`添加链接，将id传入链接路径中，之后用get请求路由接收这个链接，并用`params`获取这个id，进行删除。相当于静态网页中用自定义属性给标签设置id，js中获取自定义属性进行删除
+更改`list.ejs`中`<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>`标签为
+```html
+<a href="/account/<%= account.id %>">
+    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+</a>
+```
+account.js：
+```js
+router.get('/:id', function (req, res) {
+  const id = req.params.id; //获取id
+  db.get("accounts").remove({ id: id }).write(); //删除数据
+  res.render('success', { msg: "删除成功", url: "/account" }); //删除成功提醒
+});
 ```

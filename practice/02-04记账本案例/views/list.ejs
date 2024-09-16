@@ -29,33 +29,53 @@
                 <h2>记账本</h2>
                 <hr />
                 <div class="accounts">
-                    <div class="panel panel-danger">
-                        <div class="panel-heading">2023-04-05</div>
-                        <div class="panel-body">
-                            <div class="col-xs-6">抽烟只抽煊赫门，一生只爱一个人</div>
-                            <div class="col-xs-2 text-center">
-                                <span class="label label-warning">支出</span>
+                    <% accounts.forEach(account=>{ %>
+                        <% if(account.type==='-1' ){ %>
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">
+                                    <%= account.time %>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-xs-6">
+                                        <%= account.title %>
+                                    </div>
+                                    <div class="col-xs-2 text-center">
+                                        <span class="label label-warning">支出</span>
+                                    </div>
+                                    <div class="col-xs-2 text-right">
+                                        <%= account.account %>
+                                    </div>
+                                    <div class="col-xs-2 text-right">
+                                        <a href="/account/<%= account.id %>">
+                                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-xs-2 text-right">25 元</div>
-                            <div class="col-xs-2 text-right">
-                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-success">
-                        <div class="panel-heading">2023-04-15</div>
-                        <div class="panel-body">
-                            <div class="col-xs-6">3 月份发工资</div>
-                            <div class="col-xs-2 text-center">
-                                <span class="label label-success">收入</span>
-                            </div>
-                            <div class="col-xs-2 text-right">4396 元</div>
-                            <div class="col-xs-2 text-right">
-                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            </div>
-                        </div>
-                    </div>
-
+                            <% }else{ %>
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">
+                                        <%= account.time %>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="col-xs-6">
+                                            <%= account.title %>
+                                        </div>
+                                        <div class="col-xs-2 text-center">
+                                            <span class="label label-success">收入</span>
+                                        </div>
+                                        <div class="col-xs-2 text-right">
+                                            <%= account.account %>
+                                        </div>
+                                        <div class="col-xs-2 text-right">
+                                            <a href="/account/<%= account.id %>">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+                                    <% }) %>
                 </div>
             </div>
         </div>
