@@ -29,6 +29,8 @@
     - [json-server](#json-server)
     - [接口测试工具](#接口测试工具)
       - [apipost](#apipost)
+      - [postman](#postman)
+    - [综合案例](#综合案例-1)
 
 <!-- /code_chunk_output -->
 
@@ -867,3 +869,174 @@ router.get('/:id', function (req, res) {
 在整个项目做完后，还可以直接分享项目
 ![apipost20](./md-image/apipost20.png){:width=150 height=150}
 ![apipost21](./md-image/apipost21.png){:width=250 height=250}
+###### postman
+点开下载的文件`Postman-win64-Setup.exe`，开始会提示`create an account or sign in`，按alt+F4关闭，打开它在桌面上创建的快捷方式，这时就不会提示登录了
+使用方法基本与[apipost](#apipost)相同
+![postman1](./md-image/postman1.png){:width=250 height=250}
+一些区别：
+- 新增接口按钮在上边栏
+- Params是查询字符串，Headers是请求头，Body是请求体
+- 设置json格式的请求体：
+    ![postman2](./md-image/postman2.png){:width=200 height=200}
+- 保存时需要存储在一个目录中，如果没有目录，会让你先创建目录再保存
+    ![postman3](./md-image/postman3.png){:width=300 height=300}
+##### 综合案例
+为记账本添加接口
+更改文件夹结构，在routes下新建文件夹web，存储网页端的路由，在vscode中将routes的两个js文件移入其中，此时提示“是否更新导入”，选择“是”。之后更改app.js中两个js文件的引入路径：
+```js
+/* app.js */
+var accountRouter = require('./routes/web/account');
+var createRouter = require('./routes/web/create');
+```
+之后在routes下新建文件夹api，存储接口，其中新建文件`account.js`，将web中的`account.js`文件内容全部复制到其中，此后的接口都是在这个文件中写。在app.js中引入它：
+```js
+/* app.js */
+const accountRouterAPI = require('./routes/api/account');
+app.use("/api/account", accountRouterAPI);
+```
+![接口综合案例2](./md-image/接口综合案例2.png){:width=120 height=120}
+为什么不用写`create.js`：因为它只有一个负责渲染添加账单页面的路由，接口中不负责渲染页面
+在网页中使用`http://127.0.0.1:3000/api/xxx`来访问api
+此时访问`http://127.0.0.1:3000/api/account`可以看到记账本页面：
+![接口综合案例1](./md-image/接口综合案例1.png){:width=100 height=100}
+**修改思路**：因为这里我们做的是接口，接口不返回页面，而是返回数据，因此将`res.render`（直接返回一个HTML页面）改成`res.json`（返回一个json数据），其内容为
+- `code`响应编号
+  - 响应成功：取值`20000`或`0000`或`000000`，常用`0000`
+  - 响应失败：取值`1001`、`1002`、...（以1开头，后面的值为具体错误类型，自行规定）
+- `msg`响应信息，如“读取成功”
+- `data`响应数据，这里是从数据库中查到的信息
+
+**获取账单**：更改`get('/')`的`res.render('list', { accounts: data, moment: moment })`（读取成功处理）：
+```js
+/* account.js */
+res.json({
+    code: '0000',
+    msg: '读取成功',
+    data: data
+});
+```
+`res.render('error', { msg: "读取失败", url: "/account" });res.status(500);`（读取失败处理）：
+```js
+/* account.js */
+res.json({
+    code: "1001",
+    msg: '读取失败',
+    data: null
+});
+```
+使用apipost进行测试：
+![接口综合案例3](./md-image/接口综合案例3.png){:width=200 height=200}
+如何测试失败的情况：停止mongodb服务即可
+![接口综合案例4](./md-image/接口综合案例4.png){:width=200 height=200}
+**添加账单**：更改`post('/')`的`res.render('success', { msg: "添加成功", url: "/account" })`（读取成功处理）：
+```js
+/* account.js */
+res.json({
+    code: "0000",
+    msg: '创建成功',
+    data: data
+});
+```
+更改`res.render('error', { msg: "添加失败", url: "/create" });res.status(500);`（读取失败处理）：
+```js
+/* account.js */
+res.json({
+    code: "1002",
+    msg: '创建失败',
+    data: null
+});
+```
+![接口综合案例5](./md-image/接口综合案例5.png){:width=500 height=500}
+如何测试创建失败：让某个必填项空着就可以
+![接口综合案例6](./md-image/接口综合案例6.png){:width=400 height=400}
+注：这里测试时既可以用raw（json格式）请求体也可以用form-data（表单--查询字符串形式），因为在app.js中它设置了：
+```js
+/* app.js */
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+```
+这样`req.body`就能同上解析这两种格式
+**删除账单**：更改`get('/:id')`路由
+```js
+/* account.js */
+router.delete('/:id', function (req, res) {
+    const id = req.params.id; //获取id
+    AccountModel.deleteOne({ _id: id }, (err, data) => {
+        if (err) {
+            res.json({
+                code: "1003",
+                msg: '删除失败',
+                data: null
+            });
+            return;
+        }
+        res.json({
+            code: "0000",
+            msg: '删除成功',
+            data: null
+        });
+    });
+});
+```
+![接口综合案例7](./md-image/接口综合案例7.png){:width=200 height=200}
+![接口综合案例8](./md-image/接口综合案例8.png){:width=200 height=200}
+**获取单个账单**：这个功能在原路由中没有，需要新增
+```js
+/* account.js */
+router.get('/:id', function (req, res) {
+    let { id } = req.params;
+    AccountModel.findById(id, (err, data) => {
+        if (err) {
+            res.json({
+                code: "1004",
+                msg: '读取单个账单失败',
+                data: null
+            });
+            return;
+        }
+        res.json({
+            code: '0000',
+            msg: '读取成功',
+            data: data
+        });
+    });
+});
+```
+![接口综合案例9](./md-image/接口综合案例9.png){:width=300 height=300}
+![接口综合案例10](./md-image/接口综合案例10.png){:width=200 height=200}
+**更新账单**：这个功能在原路由中没有，需要新增
+```js
+/* account.js */
+router.patch('/:id', function (req, res) {
+    let { id } = req.params;
+    AccountModel.updateOne({ _id: id }, req.body, (err, data) => {
+        if (err) {
+            res.json({
+                code: "1005",
+                msg: '更新账单失败',
+                data: null
+            });
+            return;
+        }
+        //要求返回更新后的结果：再查询一次
+        AccountModel.findById(id, (err, data) => {
+            if (err) {
+                res.json({
+                    code: "1004",
+                    msg: '读取单个账单失败',
+                    data: null
+                });
+                return;
+            }
+            res.json({
+                code: '0000',
+                msg: '更新成功',
+                data: data
+            });
+        });
+    });
+});
+```
+![接口综合案例11](./md-image/接口综合案例11.png){:width=400 height=400}
+![接口综合案例12](./md-image/接口综合案例12.png){:width=300 height=300}
+注：这部分案例只能在接口测试工具中验证，因为不返回页面，因此无法在网页中查看
