@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css" rel="stylesheet" />
+    <style>
+        label {
+            font-weight: normal;
+        }
+
+        .panel-body .glyphicon-remove {
+            display: none;
+        }
+
+        .panel-body:hover .glyphicon-remove {
+            display: inline-block
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-8 col-lg-offset-2">
+                <div class="row">
+                    <h2 class="col-xs-6">记账本</h2>
+                    <h2 class="col-xs-6 text-right"><a href="/create" class="btn btn-primary">添加账单</a></h2>
+                </div>
+                <hr />
+                <div class="accounts">
+                    <% accounts.forEach(account=>{ %>
+                        <% if(account.type===-1 ){ %>
+                            <div class="panel panel-danger">
+                                <div class="panel-heading">
+                                    <%= moment(account.time).format('YYYY-MM-DD') %>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-xs-6">
+                                        <%= account.title %>
+                                    </div>
+                                    <div class="col-xs-2 text-center">
+                                        <span class="label label-warning">支出</span>
+                                    </div>
+                                    <div class="col-xs-2 text-right">
+                                        <%= account.account %>
+                                    </div>
+                                    <div class="col-xs-2 text-right">
+                                        <a class="del_btn" href="/account/<%= account._id %>">
+                                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }else{ %>
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">
+                                        <%= moment(account.time).format('YYYY-MM-DD') %>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="col-xs-6">
+                                            <%= account.title %>
+                                        </div>
+                                        <div class="col-xs-2 text-center">
+                                            <span class="label label-success">收入</span>
+                                        </div>
+                                        <div class="col-xs-2 text-right">
+                                            <%= account.account %>
+                                        </div>
+                                        <div class="col-xs-2 text-right">
+                                            <a class="del_btn" href="/account/<%= account._id %>">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+                                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const del_btn = document.querySelectorAll(".del_btn"); //删除按钮
+    del_btn.forEach(item => {
+        item.addEventListener("click", function (e) {
+            if (confirm("确认删除？")) {
+                return;
+            } else {
+                e.preventDefault(); //阻止默认行为（跳转->发送请求）
+            }
+        });
+    });
+</script>
+
+</html>
