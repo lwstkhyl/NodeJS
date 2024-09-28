@@ -19,6 +19,9 @@ router.post('/', (req, res) => { //登录的post请求
             res.render('error', { msg: "账号或密码错误", url: "/login" });
             return;
         }
+        //写入session
+        req.session.username = data.username;
+        req.session._id = data._id; //数据库中id，方便后续查询
         res.render('success', { msg: "登录成功", url: "/account" });
     });
 });

@@ -3,13 +3,32 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require("express-session");
+const mongo_store = require("connect-mongo");
+const { DBHOST, DBPORT, DBNAME } = require("./config/config");
 
 var accountRouter = require('./routes/account');
 var createRouter = require('./routes/create');
 var authRouter = require('./routes/auth');
 var loginRouter = require('./routes/login');
+var logoutRouter = require('./routes/logout');
+var indexRouter = require('./routes/index');
 
 var app = express();
+
+app.use(session({
+  name: "sid",
+  secret: 'jiamizifuchuan',
+  saveUninitialized: false,
+  resave: true,
+  store: mongo_store.create({
+    mongoUrl: `mongodb://${DBHOST}:${DBPORT}/${DBNAME}`
+  }),
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 3600 * 24 * 7 //7天
+  }
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,10 +44,12 @@ app.use('/account', accountRouter);
 app.use('/create', createRouter);
 app.use('/reg', authRouter);
 app.use('/login', loginRouter);
+app.use('/logout', logoutRouter);
+app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+  res.render('404');
 });
 
 // error handler
