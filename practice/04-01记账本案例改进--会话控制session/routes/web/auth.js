@@ -1,7 +1,7 @@
 const express = require("express");
 const md5 = require("md5");
 const router = express.Router();
-const UserModel = require("../models/UserModel"); //导入模型
+const UserModel = require("../../models/UserModel"); //导入模型
 router.get('/', (req, res) => { //渲染注册页面
     res.render("auth/reg");
 });

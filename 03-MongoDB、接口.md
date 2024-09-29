@@ -881,7 +881,7 @@ router.get('/:id', function (req, res) {
 - 保存时需要存储在一个目录中，如果没有目录，会让你先创建目录再保存
     ![postman3](./md-image/postman3.png){:width=300 height=300}
 ##### 综合案例
-为记账本添加接口
+为记账本添加接口，在APP端可以使用这些接口获取数据
 更改文件夹结构，在routes下新建文件夹web，存储网页端的路由，在vscode中将routes的两个js文件移入其中，此时提示“是否更新导入”，选择“是”。之后更改app.js中两个js文件的引入路径：
 ```js
 /* app.js */

@@ -27,6 +27,7 @@
     "express": "^4.20.0",
     "express-session": "^1.18.0",
     "formidable": "^2.1.2",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^6.9.2"
   }
 }

@@ -7,13 +7,13 @@ const session = require("express-session");
 const mongo_store = require("connect-mongo");
 const { DBHOST, DBPORT, DBNAME } = require("./config/config");
 
-var accountRouter = require('./routes/account');
-var createRouter = require('./routes/create');
-var authRouter = require('./routes/auth');
-var loginRouter = require('./routes/login');
-var logoutRouter = require('./routes/logout');
-var indexRouter = require('./routes/index');
-
+var accountRouter = require('./routes/web/account');
+var createRouter = require('./routes/web/create');
+var authRouter = require('./routes/web/auth');
+var loginRouter = require('./routes/web/login');
+var logoutRouter = require('./routes/web/logout');
+var indexRouter = require('./routes/web/index');
+const accountRouterAPI = require('./routes/api/account');
 var app = express();
 
 app.use(session({
@@ -46,6 +46,7 @@ app.use('/reg', authRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/', indexRouter);
+app.use("/api/account", accountRouterAPI);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

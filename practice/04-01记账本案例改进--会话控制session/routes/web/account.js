@@ -5,9 +5,9 @@ const shortid = require("shortid");
 //导入moment包
 const moment = require("moment");
 //导入模型文件
-const AccountModel = require("../models/AccountModel");
+const AccountModel = require("../../models/AccountModel");
 //导入检测登录中间件
-const check_login = require("../middleware/check_login");
+const check_login = require("../../middleware/check_login");
 //响应表单提交的post请求
 router.post('/', check_login, function (req, res) {
   AccountModel.create({
