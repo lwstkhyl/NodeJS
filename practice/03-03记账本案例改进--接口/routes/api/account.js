@@ -11,7 +11,6 @@ router.post('/', function (req, res) {
         time: moment(req.body.time).toDate() //再修改time属性（自动覆盖）
     }, (err, data) => {
         if (err) {
-            console.log(err);
             res.json({
                 code: "1001",
                 msg: '创建失败',

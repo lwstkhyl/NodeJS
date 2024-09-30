@@ -13,7 +13,6 @@ router.post('/', function (req, res) {
     time: moment(req.body.time).toDate() //再修改time属性（自动覆盖）
   }, (err, data) => {
     if (err) {
-      console.log(err);
       res.render('error', { msg: "添加失败", url: "/create" }); //添加失败提醒
       res.status(500);
       return;

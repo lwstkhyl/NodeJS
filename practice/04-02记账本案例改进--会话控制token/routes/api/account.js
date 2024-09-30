@@ -1,17 +1,14 @@
 const express = require('express');
-const router = express.Router();
-//导入moment包
 const moment = require("moment");
-//导入模型文件
 const AccountModel = require("../../models/AccountModel");
-//响应表单提交的post请求
-router.post('/', function (req, res) {
+const check_token = require("../../middleware/check_token");
+const router = express.Router();
+router.post('/', check_token, function (req, res) {
     AccountModel.create({
         ...req.body, //先把全部属性放入
         time: moment(req.body.time).toDate() //再修改time属性（自动覆盖）
     }, (err, data) => {
         if (err) {
-            console.log(err);
             res.json({
                 code: "1001",
                 msg: '创建失败',
@@ -27,7 +24,8 @@ router.post('/', function (req, res) {
     });
 });
 //主页面
-router.get('/', function (req, res) {
+router.get('/', check_token, function (req, res) {
+    console.log(req.user);
     AccountModel.find().sort({ time: -1 }).exec((err, data) => { //按时间倒序（新的在上面）
         if (err) {
             res.json({
@@ -45,7 +43,7 @@ router.get('/', function (req, res) {
     });
 });
 //删除数据
-router.delete('/:id', function (req, res) {
+router.delete('/:id', check_token, function (req, res) {
     const id = req.params.id; //获取id
     AccountModel.deleteOne({ _id: id }, (err, data) => {
         if (err) {
@@ -64,7 +62,7 @@ router.delete('/:id', function (req, res) {
     });
 });
 //获取单个账单信息
-router.get('/:id', function (req, res) {
+router.get('/:id', check_token, function (req, res) {
     let { id } = req.params;
     AccountModel.findById(id, (err, data) => {
         if (err) {
@@ -83,7 +81,7 @@ router.get('/:id', function (req, res) {
     });
 });
 //更新单个账单信息
-router.patch('/:id', function (req, res) {
+router.patch('/:id', check_token, function (req, res) {
     let { id } = req.params;
     AccountModel.updateOne({ _id: id }, req.body, (err, data) => {
         if (err) {
