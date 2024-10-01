@@ -1,1 +1,1 @@
-b站课程<a href="https://www.bilibili.com/video/BV1gM411W7ex/" target="_blank">尚硅谷Node.js零基础视频教程</a>笔记
+（已完结）b站课程<a href="https://www.bilibili.com/video/BV1gM411W7ex/" target="_blank">尚硅谷Node.js零基础视频教程</a>笔记 [资料下载](https://pan.baidu.com/share/init?surl=sDOMvUdY9UF3mlJ7ujOADg&pwd=s3wj#list/path=%2F) 提取码：s3wj
