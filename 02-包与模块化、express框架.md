@@ -173,11 +173,10 @@ console.log(arguments.callee.toString()); //输出自执行函数内容
 const m = require('./module');
 const m1 = require('./module');
 ```
-```
+```js
 function (exports, require, module, __filename, __dirname) {
-module.exports = "我是一个index.js";
-console.log(arguments.callee.toString()); //输出自执行函数内容
-
+    module.exports = "我是一个index.js";
+    console.log(arguments.callee.toString()); //输出自执行函数内容
 }
 ```
 导入了两次模块，只输出了一次自执行函数，这是因为第二次导入模块时使用了第一次导入的缓存
